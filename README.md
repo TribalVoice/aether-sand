@@ -11,7 +11,7 @@ Load any audio file and explore wet grains, massive reverb (SuperMassive-inspire
 - Massive convolution reverb
 - Smear for Freeze texturalisation
 - Tunable resonant Note Filter
-- MIDI in (notes set position, CCs for parameters)
+- MIDI in (notes set position, CCs for parameters) — see [MIDI-Implementation-Chart.md](MIDI-Implementation-Chart.md)
 - Presets (localStorage)
 - Record to 16-bit stereo WAV
 - Lookahead scheduler for stable timing
