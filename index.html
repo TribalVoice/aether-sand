@@ -284,6 +284,11 @@
       <button id="loadPreset">Load</button>
       <button id="deletePreset">Delete</button>
     </div>
+    <div class="row">
+      <button id="exportPresets">Export</button>
+      <button id="importPresets">Import</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;">
+    </div>
 
     <div class="section-title">HQ EXPORT</div>
     <label>Bit depth
@@ -967,6 +972,48 @@ document.getElementById('deletePreset').onclick = () => {
   delete saved[name];
   localStorage.setItem(PRESET_KEY, JSON.stringify(saved));
   loadPresetList();
+};
+
+// Export / Import presets as JSON
+document.getElementById('exportPresets').onclick = () => {
+  const saved = JSON.parse(localStorage.getItem(PRESET_KEY) || '{}');
+  if (Object.keys(saved).length === 0) {
+    alert('No presets to export');
+    return;
+  }
+  const blob = new Blob([JSON.stringify(saved, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `aether-sand-presets-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+document.getElementById('importPresets').onclick = () => {
+  document.getElementById('importFile').click();
+};
+
+document.getElementById('importFile').onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const imported = JSON.parse(reader.result);
+      if (typeof imported !== 'object' || imported === null) throw new Error('Invalid format');
+      const existing = JSON.parse(localStorage.getItem(PRESET_KEY) || '{}');
+      // Merge: imported presets overwrite same names
+      Object.assign(existing, imported);
+      localStorage.setItem(PRESET_KEY, JSON.stringify(existing));
+      loadPresetList();
+      alert(`Imported ${Object.keys(imported).length} preset(s)`);
+    } catch (err) {
+      alert('Could not import presets: ' + err.message);
+    }
+    e.target.value = ''; // reset so same file can be re-imported
+  };
+  reader.readAsText(file);
 };
 
 // ========== HQ WAV RECORDING ==========
